@@ -14,7 +14,7 @@ conda activate coffee
 
 Install `PIP` requirements
 ```console
-pip install -r code\requirements.txt
+pip install -r requirements.txt
 ```
 
 Update the values in `.env-sample` and rename it to `.env`.

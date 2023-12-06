@@ -1,0 +1,555 @@
+[  
+    {  
+        "id": "c001",  
+        "item": "Espresso",  
+        "price": 2.5,  
+        "description": "Rich, full-bodied coffee, with a compact crema and strong aroma.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c002",  
+        "item": "Cappuccino",  
+        "price": 3.0,  
+        "description": "Classic Italian coffee drink, combining Espresso, steamed milk, and topped with froth.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c003",  
+        "item": "Latte",  
+        "price": 3.5,  
+        "description": "Creamy coffee drink made with espresso and steamed milk.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c004",  
+        "item": "Macchiato",  
+        "price": 4.0,  
+        "description": "Espresso with a small amount of milk, 'stained' with foam on the top.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c005",  
+        "item": "Mocha",  
+        "price": 4.5,  
+        "description": "Delicious combination of coffee, milk and chocolate.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c006",  
+        "item": "Americano",  
+        "price": 2.0,  
+        "description": "Espresso shots topped with hot water to produce a light layer of crema.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c007",  
+        "item": "Caramel Macchiato",  
+        "price": 5.0,  
+        "description": "A rich and creamy blend of vanilla, coffee, milk and caramel.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c008",  
+        "item": "Black Coffee",  
+        "price": 2.0,  
+        "description": "Strong, bold coffee with a robust flavor.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c009",  
+        "item": "Flat White",  
+        "price": 3.5,  
+        "description": "A creamy blend of coffee and milk, with a velvety texture.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c010",  
+        "item": "Iced Coffee",  
+        "price": 3.0,  
+        "description": "Refreshing, chilled coffee, perfect for a hot day.",  
+        "category": "Coffees"  
+    }, 
+    {  
+        "id": "c011",  
+        "item": "Cold Brew",  
+        "price": 4.0,  
+        "description": "A type of coffee made by steeping coffee beans in cold water for several hours.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c012",  
+        "item": "Flat White",  
+        "price": 3.5,  
+        "description": "A coffee drink made with espresso and microfoam, a steamed milk with small, fine bubbles.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c013",  
+        "item": "Cortado",  
+        "price": 3.5,  
+        "description": "A beverage consisting of espresso mixed with a roughly equal amount of warm milk to reduce the acidity.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c014",  
+        "item": "Affogato",  
+        "price": 4.0,  
+        "description": "A coffee-based dessert. It usually takes the form of a scoop of vanilla gelato or ice cream topped or 'drowned' with a shot of hot espresso.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c015",  
+        "item": "Cafe au Lait",  
+        "price": 3.5,  
+        "description": "A coffee drink made with strong hot coffee and scalded milk.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c016",  
+        "item": "Cafe Bombon",  
+        "price": 4.0,  
+        "description": "A Spanish drink made by mixing espresso with sweetened condensed milk in equal parts.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c017",  
+        "item": "Cafe Breve",  
+        "price": 4.0,  
+        "description": "A coffee drink made with espresso and half-and-half instead of milk.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "c018",  
+        "item": "Cafe Con Leche",  
+        "price": 4.0,  
+        "description": "A Spanish coffee beverage consisting of strong or bold coffee mixed with scalded milk in approximately equal amounts.",  
+        "category": "Coffees"  
+    },  
+    {  
+        "id": "t001",  
+        "item": "Green Tea",  
+        "price": 2.0,  
+        "description": "Refreshing and lightly sweetened green tea, perfect for any time of the day.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t002",  
+        "item": "Chai Latte",  
+        "price": 3.5,  
+        "description": "Deliciously warm blend of spices, milk, and tea that's comforting and aromatic.",  
+        "category": "Tea or Chai"  
+    },
+    {  
+        "id": "t003",  
+        "item": "Black Tea",  
+        "price": 2.5,  
+        "description": "Strong, robust tea with a rich flavor.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t004",  
+        "item": "Herbal Tea",  
+        "price": 2.0,  
+        "description": "Aromatic, caffeine-free tea made from a blend of herbs, fruits, and flowers.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t005",  
+        "item": "Oolong Tea",  
+        "price": 3.0,  
+        "description": "Traditional Chinese tea with a unique and rich flavor.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t006",  
+        "item": "Iced Tea",  
+        "price": 2.5,  
+        "description": "Refreshing, chilled tea, perfect for a hot day.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t007",  
+        "item": "Chamomile Tea",  
+        "price": 2.5,  
+        "description": "A herbal tea made from the flowers of the chamomile plant.",  
+        "category": "Tea or Chai"  
+    },
+    {  
+        "id": "t008",  
+        "item": "Chai Tea",  
+        "price": 3.0,  
+        "description": "A flavored tea beverage made by brewing black tea with a mixture of aromatic Indian spices and herbs.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t009",  
+        "item": "Earl Grey Tea",  
+        "price": 3.0,  
+        "description": "A tea blend which has been flavored with the addition of oil of bergamot.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t010",  
+        "item": "English Breakfast Tea",  
+        "price": 3.0,  
+        "description": "A traditional blend of teas originating from Assam, Ceylon, and Kenya.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t011",  
+        "item": "Jasmine Tea",  
+        "price": 3.0,  
+        "description": "A tea scented with the aroma of jasmine blossoms.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t012",  
+        "item": "Lemon Tea",  
+        "price": 2.5,  
+        "description": "A tea with a lemon flavor.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t013",  
+        "item": "Mint Tea",  
+        "price": 2.5,  
+        "description": "A tea with a mint flavor.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t014",  
+        "item": "Rooibos Tea",  
+        "price": 3.0,  
+        "description": "A tea made from the leaves of the rooibos plant.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t015",  
+        "item": "White Tea",  
+        "price": 3.0,  
+        "description": "A tea made from the buds and young leaves of the tea plant.",  
+        "category": "Tea or Chai"  
+    },  
+    {  
+        "id": "t016",  
+        "item": "Yerba Mate Tea",
+        "price": 3.0,
+        "description": "A tea made from the leaves of the yerba mate plant.",
+        "category": "Tea or Chai"
+    },
+    {  
+        "id": "b001",  
+        "item": "Blueberry Muffin",  
+        "price": 2.5,  
+        "description": "Soft and moist muffin packed with fresh blueberries and a crumb topping.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b002",  
+        "item": "Croissant",  
+        "price": 2.0,  
+        "description": "Buttery, flaky pastry, freshly baked to golden perfection.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b003",  
+        "item": "Bagel",  
+        "price": 1.5,  
+        "description": "Delicious, dense and chewy bread product, perfect for a quick breakfast.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b004",  
+        "item": "Donut",  
+        "price": 2.5,  
+        "description": "Sweet, fried doughnut with a sugar glaze.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b005",  
+        "item": "Cheese Danish",  
+        "price": 3.0,  
+        "description": "Flaky, buttery pastry filled with creamy cheese.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b006",  
+        "item": "Cinnamon Roll",  
+        "price": 4.0,  
+        "description": "Sweet roll covered in delicious cinnamon and sugar.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b007",  
+        "item": "Apple Pie",  
+        "price": 4.5,  
+        "description": "Classic dessert filled with sweet, juicy apples and a flaky crust.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b008",  
+        "item": "Cherry Tart",  
+        "price": 4.5,  
+        "description": "Delicious tart filled with sweet, juicy cherries.",  
+        "category": "Bakery"  
+    },
+    {  
+        "id": "b009",  
+        "item": "Pain au Chocolat",  
+        "price": 3.5,  
+        "description": "Classic French pastry filled with chocolate.",  
+        "category": "Bakery"  
+    },
+    {  
+        "id": "b010",  
+        "item": "Lemon Cake",  
+        "price": 4.0,  
+        "description": "Sweet and tangy lemon cake with a moist crumb.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b011",  
+        "item": "Chocolate Chip Cookie",  
+        "price": 2.5,  
+        "description": "Classic cookie loaded with chocolate chips.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b012",  
+        "item": "Brownie",  
+        "price": 3.0,  
+        "description": "Rich, fudgy brownie with a moist center and crispy edges.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b013",  
+        "item": "Cheese Bread",  
+        "price": 3.5,  
+        "description": "Soft, tender bread loaded with melted cheese.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b014",  
+        "item": "Banana Bread",  
+        "price": 4.0,  
+        "description": "Moist, sweet bread with a rich banana flavor.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b015",  
+        "item": "Pumpkin Muffin",  
+        "price": 2.5,  
+        "description": "Sweet, moist muffin filled with pumpkin flavor.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b016",  
+        "item": "Red Velvet Cake",  
+        "price": 5.0,  
+        "description": "Rich, moist cake with a distinctive red color and a creamy frosting.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b017",  
+        "item": "Pecan Pie",  
+        "price": 4.5,  
+        "description": "Classic dessert filled with sweet, nutty pecans and a flaky crust.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b018",  
+        "item": "Carrot Cake",  
+        "price": 4.0,  
+        "description": "Moist, sweet cake with a rich carrot and cinnamon flavor.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b019",  
+        "item": "Apple Fritter",  
+        "price": 3.0,  
+        "description": "Sweet, fried doughnut filled with apple pieces and coated in sugar.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b020",  
+        "item": "Peach Cobbler",  
+        "price": 4.5,  
+        "description": "Classic dessert filled with sweet, juicy peaches and a flaky crust.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b021",  
+        "item": "Strawberry Tart",  
+        "price": 4.5,  
+        "description": "Delightful tart filled with fresh strawberries.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b022",  
+        "item": "Chocolate Croissant",  
+        "price": 3.0,  
+        "description": "Flaky croissant filled with rich chocolate.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b023",  
+        "item": "Pretzel",  
+        "price": 2.5,  
+        "description": "Classic soft pretzel with a nice chew.",  
+        "category": "Bakery"  
+    },  
+    {  
+        "id": "b024",  
+        "item": "Scones",  
+        "price": 3.0,  
+        "description": "Buttery and crumbly traditional English baked good.",  
+        "category": "Bakery"  
+    },    
+    {  
+        "id": "s001",  
+        "item": "Ham and Cheese Sandwich",  
+        "price": 5.0,  
+        "description": "Classic sandwich filled with ham and cheese.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s002",  
+        "item": "Chicken Sandwich",  
+        "price": 5.5,  
+        "description": "Delicious sandwich filled with chicken and veggies.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s003",  
+        "item": "Veggie Sandwich",  
+        "price": 5.0,  
+        "description": "Healthy sandwich filled with fresh veggies.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s004",  
+        "item": "Club Sandwich",  
+        "price": 6.0,  
+        "description": "Triple-decker sandwich with chicken, bacon, lettuce, and tomato.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s005",  
+        "item": "Tuna Sandwich",  
+        "price": 5.5,  
+        "description": "Classic sandwich filled with tuna and mayo.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s006",  
+        "item": "Egg Salad Sandwich",  
+        "price": 5.0,  
+        "description": "Classic sandwich filled with creamy egg salad.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s007",  
+        "item": "BLT Sandwich",  
+        "price": 5.5,  
+        "description": "Classic sandwich filled with bacon, lettuce, and tomato.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s008",  
+        "item": "Cheese Sandwich",  
+        "price": 4.5,  
+        "description": "Simple sandwich filled with cheese.",  
+        "category": "Sandwiches"  
+    },       
+    {  
+        "id": "s009",  
+        "item": "Chicken Caesar Wrap",  
+        "price": 6.5,  
+        "description": "Tasty wrap filled with chicken, lettuce, and Caesar dressing.",  
+        "category": "Sandwiches"  
+    },
+    {  
+        "id": "s010",  
+        "item": "Roast Beef Sandwich",  
+        "price": 6.5,  
+        "description": "Delicious sandwich filled with roast beef and cheese.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s011",  
+        "item": "Turkey Sandwich",  
+        "price": 6.0,  
+        "description": "Classic sandwich filled with turkey and cranberry sauce.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s012",  
+        "item": "Salmon Sandwich",  
+        "price": 7.0,  
+        "description": "Delicious sandwich filled with smoked salmon and cream cheese.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "s013",  
+        "item": "Grilled Cheese Sandwich",  
+        "price": 5.0,  
+        "description": "Comforting sandwich with melted cheese between toasted bread.",  
+        "category": "Sandwiches"  
+    },  
+    {  
+        "id": "sm001",  
+        "item": "Strawberry Banana Smoothie",  
+        "price": 5.0,  
+        "description": "Refreshing smoothie made with strawberries and bananas.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm002",  
+        "item": "Blueberry Smoothie",  
+        "price": 5.5,  
+        "description": "Delicious smoothie made with fresh blueberries.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm003",  
+        "item": "Mango Banana Smoothie",  
+        "price": 5.5,  
+        "description": "Tropical smoothie made with ripe mangoes, and banana.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm004",  
+        "item": "Green Smoothie",  
+        "price": 6.0,  
+        "description": "Healthy smoothie made with spinach, apple, and banana.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm005",  
+        "item": "Peanut Butter Banana Smoothie",  
+        "price": 6.5,  
+        "description": "Creamy smoothie made with peanut butter and bananas.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm006",  
+        "item": "Chocolate Smoothie",  
+        "price": 6.0,  
+        "description": "Rich and creamy smoothie made with chocolate.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm007",  
+        "item": "Pineapple Smoothie",  
+        "price": 5.5,  
+        "description": "Refreshing smoothie made with fresh pineapple.",  
+        "category": "Smoothies"  
+    },  
+    {  
+        "id": "sm008",  
+        "item": "Peach Smoothie",  
+        "price": 5.5,  
+        "description": "Delicious smoothie made with fresh peaches.",  
+        "category": "Smoothies"  
+    }
+]
