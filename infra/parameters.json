@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vulnerabilityAssessments_Default_storageContainerPath": {
+            "value": null
+        },
+        "servers_shivaserver_name": {
+            "value": null
+        },
+        "sites_shivaaifunctions_name": {
+            "value": null
+        },
+        "containerapps_contoso_coffee_name": {
+            "value": null
+        },
+        "components_shivaaifunctions_name": {
+            "value": null
+        },
+        "accounts_openaishiva_name": {
+            "value": null
+        },
+        "accounts_shivaopenai_name": {
+            "value": null
+        },
+        "storageAccounts_shivaaistorage_name": {
+            "value": null
+        },
+        "serverfarms_ASP_CognitiveGroup_a91c_name": {
+            "value": null
+        },
+        "databaseAccounts_shivacosmosdb_name": {
+            "value": null
+        },
+        "searchServices_search_n6tesxjlv4jjk_name": {
+            "value": null
+        },
+        "storageAccounts_shivaadlsgen2store_name": {
+            "value": null
+        },
+        "accounts_shivacognitiveai_name": {
+            "value": null
+        },
+        "storageAccounts_shivafunctionstorage_name": {
+            "value": null
+        },
+        "accounts_shivacontentsafety_name": {
+            "value": null
+        },
+        "accounts_shivaspeechservice_name": {
+            "value": null
+        },
+        "registries_shivagenairegistry_name": {
+            "value": null
+        },
+        "storageAccounts_n6tesxjlv4jjkazfunctions_name": {
+            "value": null
+        },
+        "accounts_shiva_cognitive_services_name": {
+            "value": null
+        },
+        "accounts_afr_cognitive_n6tesxjlv4jjk_name": {
+            "value": null
+        },
+        "workspaces_workspacecognitivegroupba7a_name": {
+            "value": null
+        },
+        "managedEnvironments_managedEnvironment_CognitiveGroup_9af8_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___shivaaifunctions_name": {
+            "value": null
+        },
+        "actiongroups_application_insights_smart_detection_externalid": {
+            "value": null
+        },
+        "workspaces_DefaultWorkspace_1fad602f_d06f_46af_8f70_78a2c2c53b24_WUS_externalid": {
+            "value": null
+        }
+    }
+}

@@ -7,7 +7,7 @@ from fastapi import FastAPI, Body,HTTPException, Request
 from fastapi.responses import StreamingResponse
 from queue import Queue
 # from pydantic.v1 import BaseModel as BaseModel_FastAPI
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 from langchain.agents import AgentType, initialize_agent
@@ -127,7 +127,7 @@ class OrderInfo(BaseModel):
     order: List[OrderedItem] = Field(description="List of items ordered and their details")
 
 @tool(args_schema=OrderInfo)  
-def calculate_total(order: list) -> str:  
+def calculate_total(order: List[OrderedItem]) -> str:  
     """
     Calculate the total price of the order.
     
@@ -245,7 +245,7 @@ async def health():
 
 if __name__ == "__main__":
     uvicorn.run(
-        "app:app",
+        "main:app",
         host="localhost",
         port=8000,
         reload=True,
