@@ -1,8 +1,9 @@
    
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 import models
 from database import engine
-from routers import auth, agent, users
+from routers import auth, agent, users, static
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -52,6 +53,10 @@ async def lifespan(app: FastAPI):
     # db.close()
 
 app = FastAPI(lifespan=lifespan)
+build_path = '/Users/bobjacobs/work/src/github.com/shivachittamuru/Contoso-RAG/frontend/cafe/dist'
+
+# Serve the static files from the React app's build directory
+app.mount("/", StaticFiles(directory=build_path, html=True), name="static")
 
 @app.get("/health")
 async def health():
@@ -63,6 +68,7 @@ models.Base.metadata.create_all(engine)
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(agent.router)
+# app.include_router(static.router)
 
 # Add SessionMiddleware with your secret key
 app.add_middleware(SessionMiddleware, secret_key="contosokey")

@@ -24,8 +24,10 @@ class ChangePassword(BaseModel):
 
 @router.get('/', status_code=status.HTTP_200_OK)
 async def get_user(user: user_dependency, db: db_dependency):
+    print('inside get_user')
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
+    print('returning user')
     return db.query(User).filter(User.id == user.get('id')).first()
 
 

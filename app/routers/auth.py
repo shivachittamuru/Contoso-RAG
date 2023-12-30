@@ -45,24 +45,29 @@ credentials_exception = HTTPException(
 
 
 def get_user(db: Session, username: str):
+    print('inside get_user')
     user = db.query(User).filter(User.username == username).first()
     if not user:
         raise credentials_exception
     return user
 
 def verify_password(plain_password, hashed_password):
+    print('inside verify_password')
     return bcrypt_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
+    print('inside get_password_hash')
     return bcrypt_context.hash(password)
 
 def authenticate_user(db: db_dependency, username: str, password: str):
+    print('inside authenticate_user')
     user = get_user(db, username)
     if not verify_password(password, user.hashed_password):
         raise credentials_exception
     return user
 
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=15)):
+    print('inside create_access_token')
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({'exp': expire})
@@ -71,19 +76,26 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
+        print('inside get_current_user')
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(payload)
         username: str = payload.get('sub')
+        print(username)
         user_id: int = payload.get('id')
+        print(user_id)
         user_role: str = payload.get('role')
+        print(user_role)
         if username is None or user_id is None:
             raise credentials_exception
         return {'username': username, 'id': user_id, 'user_role': user_role}
     except JWTError:
+        print('inside JWTError')
         raise credentials_exception
     
 
 @router.post('/register', status_code=status.HTTP_201_CREATED)
 async def register_user(user: RegisterUser, db: db_dependency):
+    print('inside register_user')
     db_user = User(
         username=user.username,
         email=user.email,
@@ -100,6 +112,7 @@ async def register_user(user: RegisterUser, db: db_dependency):
 @router.post('/token', response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
+    print('inside login_for_access_token')
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise credentials_exception
