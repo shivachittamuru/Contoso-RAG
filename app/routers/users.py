@@ -30,6 +30,10 @@ async def get_user(user: user_dependency, db: db_dependency):
     print('returning user')
     return db.query(User).filter(User.id == user.get('id')).first()
 
+@router.get('/hello', status_code=status.HTTP_200_OK)
+async def get_user(user: user_dependency, db: db_dependency):
+    print('inside get_user')
+    return { 'message': 'hello world' }
 
 @router.put('/password', status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(user: user_dependency, change_password: ChangePassword, db: db_dependency):

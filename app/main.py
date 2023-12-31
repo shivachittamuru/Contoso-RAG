@@ -1,6 +1,7 @@
    
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import models
 from database import engine
 from routers import auth, agent, users, static
@@ -53,15 +54,19 @@ async def lifespan(app: FastAPI):
     # db.close()
 
 app = FastAPI(lifespan=lifespan)
-build_path = '/Users/bobjacobs/work/src/github.com/shivachittamuru/Contoso-RAG/frontend/cafe/dist'
 
+build_path = '../frontend/cafe/dist'    
 # Serve the static files from the React app's build directory
-app.mount("/", StaticFiles(directory=build_path, html=True), name="static")
+app.mount("/app", StaticFiles(directory=build_path, html=True), name="static")
 
 @app.get("/health")
 async def health():
     """Check the api is running"""
     return {"status": "🤙"}
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url='/app/')
 
 models.Base.metadata.create_all(engine)
 
@@ -72,6 +77,13 @@ app.include_router(agent.router)
 
 # Add SessionMiddleware with your secret key
 app.add_middleware(SessionMiddleware, secret_key="contosokey")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 if __name__ == "__main__":
     import uvicorn
