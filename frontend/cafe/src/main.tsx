@@ -8,8 +8,8 @@ import './main.css';
 console.log('entered main.tsx');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
+  <React.StrictMode> 
+   <BrowserRouter>
       <AuthProvider>
         <App />
       </AuthProvider>

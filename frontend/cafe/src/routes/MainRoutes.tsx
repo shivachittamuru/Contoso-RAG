@@ -2,6 +2,7 @@ import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
 import Default from '../views/Default';
+import ChatInterface from '../views/ChatInterface';
 import LoginPage from '../views/LoginPage';
 import ProtectedRoute from '../security/ProtectedRoute';
 
@@ -23,7 +24,7 @@ const MainRoutes: RouteObject[] = [
         children: [
           {
             index: true,
-            element: <ProtectedRoute component={Default} />,
+            element: <ProtectedRoute component={ChatInterface} />,
           }
         ],
       },
