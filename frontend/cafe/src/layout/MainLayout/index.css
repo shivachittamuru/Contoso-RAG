@@ -1,0 +1,18 @@
+/* Show it is fixed to the top */
+
+.bg-blue {
+  background-color: #0078d4;
+}
+
+body {
+  font-size: .875rem;
+}
+
+html, body {
+  height: 100%;
+  overflow: scroll;
+}
+
+.nav-flush .nav-link {
+  border-radius: 0;
+}

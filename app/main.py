@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 import models
 from database import engine
 from routers import auth, agent, users, static
@@ -57,6 +58,8 @@ app = FastAPI(lifespan=lifespan)
 
 build_path = '../frontend/cafe/dist'    
 # Serve the static files from the React app's build directory
+
+
 app.mount("/app", StaticFiles(directory=build_path, html=True), name="static")
 
 @app.get("/health")
