@@ -13,6 +13,7 @@ export const ChatInterface = () => {
   const { userToken } = useAuth();
   const [conversation, setConversation] = useState<ChatMessage[]>([]);
   const endOfMessagesRef = useRef<null | HTMLDivElement>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   // Scrolls to the end of the messages
   const scrollToBottom = () => {
@@ -23,33 +24,40 @@ export const ChatInterface = () => {
   // refresh the messages in the chat
   useEffect(scrollToBottom, [conversation]);
 
+  useEffect(() => {
+    // Clean up the event source when the component unmounts
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmedInput = input.trim();
     if (trimmedInput) {
-      // Add the user's message to the conversation
-      setConversation((prev) => [...prev, { sender: 'user', text: trimmedInput }]);
-      
-      // Call the API
-      try {
-        const response = await fetch('/user/hello', {
-            headers: {
-              Accept: 'application/json',
-              Authorization: `Bearer ${userToken?.token}`
-            }
-          });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        // Add the user's message to the conversation
+        setConversation((prev) => [...prev, { sender: 'user', text: trimmedInput }]);
+        
+        // Initialize a new EventSource
+        if (eventSourceRef.current) {
+          eventSourceRef.current.close();
         }
+        eventSourceRef.current = new EventSource(`/proxy?query=${encodeURIComponent(trimmedInput)}`);
 
-        const data = await response.json();
-        // Add the bot's response to the conversation
-        setConversation((prev) => [...prev, { sender: 'bot', text: data.message }]);
-      } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        // Listen for messages from the server
+        eventSourceRef.current.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          // Add the bot's response to the conversation
+          setConversation((prev) => [...prev, { sender: 'bot', text: data.message }]);
+        };
+  
+        eventSourceRef.current.onerror = (error) => {
+          console.error('EventSource failed:', error);
+          eventSourceRef.current?.close();
+        };
       }
-    }
 
     // Reset the input field
     setInput('');

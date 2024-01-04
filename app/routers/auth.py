@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Response, HTTPException
 from starlette import status
 from sqlalchemy.orm import Session
 from models import User
@@ -111,10 +111,12 @@ async def register_user(user: RegisterUser, db: db_dependency):
 
 @router.post('/token', response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-                                 db: db_dependency):
+                                 db: db_dependency, response: Response):
     print('inside login_for_access_token')
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise credentials_exception
     access_token = create_access_token(data={'sub': user.username, 'id': user.id, 'role': user.role}, expires_delta=timedelta(minutes=30))
+    response.set_cookie(key="auth_token", value=access_token, httponly=True, secure=True)
+
     return {'access_token': access_token, 'token_type': 'bearer'}

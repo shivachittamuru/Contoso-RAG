@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 import models
 from database import engine
-from routers import auth, agent, users, static
+from routers import auth, agent, users, proxy
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -76,7 +76,7 @@ models.Base.metadata.create_all(engine)
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(agent.router)
-# app.include_router(static.router)
+app.include_router(proxy.router)
 
 # Add SessionMiddleware with your secret key
 app.add_middleware(SessionMiddleware, secret_key="contosokey")
