@@ -53,18 +53,7 @@ export const ChatInterface = () => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Call this function whenever you want to
-  // refresh the messages in the chat
   useEffect(scrollToBottom, [conversation]);
-
-//   useEffect(() => {
-//     // Clean up the event source when the component unmounts
-//     return () => {
-//       if (eventSourceRef.current) {
-//         eventSourceRef.current.close();
-//       }
-//     };
-//   }, []);
 
 // Clean up the WebSocket when the component unmounts
   useEffect(() => {
@@ -79,9 +68,6 @@ export const ChatInterface = () => {
     event.preventDefault();
     const trimmedInput = input.trim();
     if (trimmedInput) {
-      // Add the user's message to the conversation
-    //   setConversation((prev) => [...prev, { sender: 'user', text: trimmedInput }]);
-    //   console.log(`setting conversation to ${conversation} from user input`);
     console.log(`calling initial dispatch with ${trimmedInput}`); 
     dispatch({type: ADD_MESSAGE, payload: { sender: 'user', text: trimmedInput }});
 
@@ -108,30 +94,7 @@ export const ChatInterface = () => {
           } else {
             dispatch({ type: 'APPEND_TO_LAST_MESSAGE', payload: { text: data.message } });
           }
-        // if (data.end_of_message) {
-        //   console.log('end of message is true');
-        //   dispatch({
-        //     type: ADD_MESSAGE,
-        //     payload: { sender: 'bot', text: data.message },
-        //   });
-        // } else {
-        //   console.log('end of message is false');
-        //   if (conversation.length > 0 && conversation[conversation.length - 1].sender === 'bot') {
-        //     console.log('conversation length > 0');
-        //     dispatch({
-        //       type: APPEND_MESSAGE,
-        //       payload: { text: data.message },
-        //     });
-        //   } else {
-        //     console.log('conversation length = 0');
-        //     dispatch({
-        //       type: ADD_MESSAGE,
-        //       payload: { sender: 'bot', text: data.message },
-        //     });
-        //   }
-        // }
       };
-      
       
       websocketRef.current.onerror = (error) => {
         // Handle any errors that occur
@@ -142,36 +105,6 @@ export const ChatInterface = () => {
     // Reset the input field
     setInput('');
   };
-
-//   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-//     event.preventDefault();
-//     const trimmedInput = input.trim();
-//     if (trimmedInput) {
-//         // Add the user's message to the conversation
-//         setConversation((prev) => [...prev, { sender: 'user', text: trimmedInput }]);
-        
-//         // Initialize a new EventSource
-//         if (eventSourceRef.current) {
-//           eventSourceRef.current.close();
-//         }
-//         eventSourceRef.current = new EventSource(`/proxy?query=${encodeURIComponent(trimmedInput)}`);
-
-//         // Listen for messages from the server
-//         eventSourceRef.current.onmessage = (event) => {
-//           const data = JSON.parse(event.data);
-//           // Add the bot's response to the conversation
-//           setConversation((prev) => [...prev, { sender: 'bot', text: data.message }]);
-//         };
-  
-//         eventSourceRef.current.onerror = (error) => {
-//           console.error('EventSource failed:', error);
-//           eventSourceRef.current?.close();
-//         };
-//       }
-
-//     // Reset the input field
-//     setInput('');
-//   };
 
 return (
     <div className="chat-container">
