@@ -12,10 +12,8 @@ router = APIRouter(
     tags=["user"]
 )
 
-
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
-
 
 class ChangePassword(BaseModel):
     old_password: str

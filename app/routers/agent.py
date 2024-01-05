@@ -2,6 +2,7 @@
 # from pydantic.v1 import BaseModel, Field
 # from pydantic import BaseModel as BaseModel_FastAPI
 
+import json
 from langchain.chat_models import AzureChatOpenAI
 from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import ChatPromptTemplate
@@ -15,8 +16,9 @@ from langchain.memory import CosmosDBChatMessageHistory
 from typing import Annotated
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
-from fastapi import Body, Request, APIRouter, Depends, HTTPException
+from fastapi import Body, Request, APIRouter, Depends, HTTPException, WebSocket
 from starlette import status
+from starlette.websockets import WebSocketDisconnect
 # from starlette.requests import Request
 from tools import tool_list, functions
 import random
@@ -40,6 +42,45 @@ router = APIRouter(
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
+
+async def get_agent_websocket(user: dict, model: AzureChatOpenAI) -> AgentExecutor:    
+    user_id = user['id']
+    user_name = user['username']
+    
+    session_id = "Session" + str(random.randint(1, 10000))
+
+    # Create CosmosDB instance from langchain cosmos class.
+    cosmos = CosmosDBChatMessageHistory(
+            cosmos_endpoint=settings.cosmos_endpoint,
+            cosmos_database=settings.cosmos_database_name,
+            cosmos_container=settings.cosmos_container_name,
+            connection_string=settings.cosmos_connection_string,
+            session_id=session_id,  # Use the session ID from the session  
+            user_id=str(user_id) 
+        )
+    cosmos.prepare_cosmos()
+
+    model_with_tools = model.bind(functions=functions)
+    
+    agent_prompt = AGENT_SYSTEM_PROMPT + "User Name: {0}\n".format(user_name)
+    print(user_name)
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", agent_prompt),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "User Input: {input} \n Answer:"),
+        MessagesPlaceholder(variable_name="agent_scratchpad")
+    ])
+
+    chain = prompt | model_with_tools | OpenAIFunctionsAgentOutputParser()
+    agent_chain = RunnablePassthrough.assign(
+        agent_scratchpad= lambda x: format_to_openai_functions(x["intermediate_steps"])
+    ) | chain
+    
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, chat_memory=cosmos)
+
+    agent_executor = AgentExecutor(agent=agent_chain, tools=tool_list, verbose=False, memory=memory)    
+    return agent_executor
 
 async def get_agent(user: dict, request: Request) -> AgentExecutor:    
     user_id = user['id']
@@ -114,9 +155,28 @@ class AsyncCallbackHandler(AsyncIteratorCallbackHandler):
         print(token)             
         self.queue.put_nowait(token)   
     
-    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:        
+    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:  
+        print('inside on_llm_end')      
         if response.generations[0][0].generation_info['finish_reason'] == 'stop':    
+            print('inside on_llm_end -  stop')
             self.done.set()       
+
+class AsyncWebsocketCallbackHandler(AsyncIteratorCallbackHandler):   
+    def __init__(self, websocket: WebSocket) -> None:
+        super().__init__()
+        self.websocket = websocket
+
+    async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:  
+        print(token)
+        await self.websocket.send_text(json.dumps({"message": token, "end_of_message": False}))             
+        self.queue.put_nowait(token)   
+    
+    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:  
+        print('inside on_llm_end')      
+        if response.generations[0][0].generation_info['finish_reason'] == 'stop':    
+            print('inside on_llm_end -  stop')
+            await self.websocket.send_text(json.dumps({"message": "", "end_of_message": True}))
+            self.done.set()
 
 async def run_call(query: str, stream_it: AsyncCallbackHandler, user: user_dependency, request: Request):
     # assign callback handler
@@ -125,14 +185,37 @@ async def run_call(query: str, stream_it: AsyncCallbackHandler, user: user_depen
     # now query
     await agent.acall(inputs={"input": query})
 
+async def run_websocket_call(query: str, stream_it: AsyncCallbackHandler, user: user_dependency, model: AzureChatOpenAI):
+    # assign callback handler
+    model.callbacks = [stream_it]
+    print('inside run_websocket_call and the model callbacks are set')
+    agent = await get_agent_websocket(user, model)
+    print('inside run_websocket_call and the agent is set')
+    # now query
+    await agent.acall(inputs={"input": query})
+
 async def create_gen(query: str, 
                      stream_it: AsyncCallbackHandler,
                      user: user_dependency,                     
                      request: Request):
     task = asyncio.create_task(run_call(query, stream_it, user, request))
-    async for token in stream_it.aiter():       
-        yield token
-    await task
+    
+    try:
+        async for token in stream_it.aiter():
+            print('inside stream_it.aiter() about to yield a token')
+            yield token
+            # Optionally, you could check if task is done and break if needed:
+            if task.done():
+                break
+    except Exception as e:
+        # Properly handle exceptions, possibly logging them
+        logger.error(f"Error in stream generator: {e}")
+        task.cancel()  # Cancel the background task if the stream_it iteration fails
+        raise
+    finally:
+        # Wait for the task to ensure it gets cleaned up properly
+        await task
+
 
 ######################
 
@@ -172,4 +255,56 @@ async def run_agent_streaming(
     
     stream_it = AsyncCallbackHandler()  
     gen = create_gen(query, stream_it, user, request)
-    return StreamingResponse(gen, media_type="text/event-stream")    
+    return StreamingResponse(gen, media_type="text/event-stream")
+
+@router.websocket("/ws/chat")
+async def websocket_chat(websocket: WebSocket, token: str):
+    try:
+        print('inside websocket_chat')
+        print(f'token: ${token}')
+        user = await validate_user_token(token)  
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        print('user validated')
+        await websocket.accept()
+        print('websocket accepted')
+        
+        await websocket.send_text(json.dumps({"message": "Welcome to the chat!"}))
+
+        model = websocket.app.state.azure_openai_chat_client
+        
+        stream_it = AsyncWebsocketCallbackHandler(websocket)
+        task = asyncio.create_task(run_websocket_call(websocket, stream_it, user, model))
+        
+        print('task created')
+        try:
+            while True:
+                print('inside while loop')
+                data = await websocket.receive_text()
+                print(f"While Loop Received data: {data}")
+                await process_streaming_request(data, stream_it, user, model, websocket)
+                print('processed streaming request')
+                async for message in stream_it.aiter():
+                    print('inside stream_it.aiter() about to send a message')
+                    print(f"Sending message: {message}")
+                    await websocket.send_text(message)
+                    print('message sent')
+        except WebSocketDisconnect:
+            print("WebSocket disconnected")
+        finally:
+            task.cancel()
+
+    except Exception as e:
+        print(f"Error: {e}")
+        await websocket.close()
+
+async def process_streaming_request(data, stream_it, user, model: AzureChatOpenAI, websocket: WebSocket):
+    # Extract the query from the received data
+    query = data  # Modify this line if data format is different
+    # Start processing the query
+    await run_websocket_call(query, stream_it, user, model)
+    # You may need to adjust this based on how your agent is set up
+
+async def validate_user_token(token: str):
+    return {'username': 'bobjac', 'id': 3, 'role': 'admin'}
