@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
       console.log('LoginPage.tsx - handleLogin()');
       await login(username, password);
       console.log('LoginPage.tsx - handleLogin() - login successful');
-      navigate('/');
+      navigate('/app');
     } catch (error) {
       // Set the error message state if login fails
       setErrorMessage('Login failed. Please check your username and password.');
