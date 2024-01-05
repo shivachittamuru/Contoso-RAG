@@ -8,39 +8,45 @@ type ChatMessage = {
   text: string;
 };
 
-const actionTypes = {
-    APPEND_TO_CURRENT_MESSAGE: 'APPEND_TO_CURRENT_MESSAGE',
-    ADD_MESSAGE_TO_CONVERSATION: 'ADD_MESSAGE_TO_CONVERSATION',
-};
+type ConversationState = ChatMessage[];
+
+// Define the action types
+type ConversationAction =
+  | { type: 'ADD_MESSAGE'; payload: ChatMessage }
+  | { type: 'APPEND_TO_LAST_MESSAGE'; payload: { text: string } }
+  | { type: 'END_OF_MESSAGE' }; 
+
+const ADD_MESSAGE = 'ADD_MESSAGE';
+const APPEND_TO_LAST_MESSAGE = 'APPEND_TO_LAST_MESSAGE';
 
 // Define a reducer to manage the conversation state
-const conversationReducer = (state, action) => {
+const conversationReducer = (
+    state: ConversationState, 
+    action: ConversationAction
+  ): ConversationState => {
     switch (action.type) {
-      case actionTypes.APPEND_TO_CURRENT_MESSAGE:
-        return { ...state, currentMessage: state.currentMessage + action.payload };
-      case actionTypes.ADD_MESSAGE_TO_CONVERSATION:
-        return {
-          ...state,
-          conversation: [...state.conversation, { sender: 'bot', text: state.currentMessage }],
-          currentMessage: '', // Reset currentMessage after adding it to the conversation
-        };
+      case ADD_MESSAGE:
+        return [...state, action.payload];
+      case APPEND_TO_LAST_MESSAGE: {
+        return state.map((msg, index, arr) =>
+        index === arr.length - 1 && msg.sender === 'bot'
+          ? { ...msg, text: msg.text + action.payload.text }
+          : msg
+        );
+      }
       default:
         return state;
     }
-};
+  };
+  
 
 export const ChatInterface = () => {
+  const initialState: ConversationState = []; 
+  const [conversation, dispatch] = useReducer(conversationReducer, initialState);
   const [input, setInput] = useState('');
   const { userToken } = useAuth();
-  const [conversation, setConversation] = useState<ChatMessage[]>([]);
   const endOfMessagesRef = useRef<null | HTMLDivElement>(null);
-//   const eventSourceRef = useRef<EventSource | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
-
-  const [state, dispatch] = useReducer(conversationReducer, {
-    conversation: [],
-    currentMessage: '',
-  });
 
   // Scrolls to the end of the messages
   const scrollToBottom = () => {
@@ -74,9 +80,11 @@ export const ChatInterface = () => {
     const trimmedInput = input.trim();
     if (trimmedInput) {
       // Add the user's message to the conversation
-      setConversation((prev) => [...prev, { sender: 'user', text: trimmedInput }]);
-      console.log(`setting conversation to ${conversation} from user input`);
-  
+    //   setConversation((prev) => [...prev, { sender: 'user', text: trimmedInput }]);
+    //   console.log(`setting conversation to ${conversation} from user input`);
+    console.log(`calling initial dispatch with ${trimmedInput}`); 
+    dispatch({type: ADD_MESSAGE, payload: { sender: 'user', text: trimmedInput }});
+
       // Initialize a new WebSocket
       if (websocketRef.current) {
         websocketRef.current.close();
@@ -91,35 +99,40 @@ export const ChatInterface = () => {
   
       websocketRef.current.onmessage = (event) => {
         console.log('Received message from server: ', event.data);
-        
         // Assume the server sends a special "end_of_message" property to indicate the end of a message
         const data = JSON.parse(event.data);
         console.log('data: ', data);
-
+      
         if (data.end_of_message) {
-           console.log('end of message is true');
-          // End of message received, push the accumulated message to the conversation
-          setConversation((prev) => [
-            ...prev,
-            { sender: 'bot', text: prev[prev.length - 1]?.text + data.message },
-          ]);
-        } else {
-            console.log(`end of message is false - conversation: ${conversation}`);
-          // Append token to the current message (or start a new message if there isn't one)
-          if (conversation.length > 0 && conversation[conversation.length - 1].sender === 'bot') {
-            console.log('condition met');
-            setConversation((prev) => [
-              ...prev.slice(0, -1),
-              { ...prev[prev.length - 1], text: prev[prev.length - 1].text + data.message },
-            ]);
+            dispatch({ type: 'ADD_MESSAGE', payload: { sender: 'bot', text: data.message } });
           } else {
-            console.log(`condition not met. conversation.length: ${conversation.length}. conversation[conversation.length - 1]: ${conversation[conversation.length - 1]}`);
-            setConversation((prev) => [...prev, { sender: 'bot', text: data.message }]);
+            dispatch({ type: 'APPEND_TO_LAST_MESSAGE', payload: { text: data.message } });
           }
-        }
+        // if (data.end_of_message) {
+        //   console.log('end of message is true');
+        //   dispatch({
+        //     type: ADD_MESSAGE,
+        //     payload: { sender: 'bot', text: data.message },
+        //   });
+        // } else {
+        //   console.log('end of message is false');
+        //   if (conversation.length > 0 && conversation[conversation.length - 1].sender === 'bot') {
+        //     console.log('conversation length > 0');
+        //     dispatch({
+        //       type: APPEND_MESSAGE,
+        //       payload: { text: data.message },
+        //     });
+        //   } else {
+        //     console.log('conversation length = 0');
+        //     dispatch({
+        //       type: ADD_MESSAGE,
+        //       payload: { sender: 'bot', text: data.message },
+        //     });
+        //   }
+        // }
       };
       
-  
+      
       websocketRef.current.onerror = (error) => {
         // Handle any errors that occur
         console.error('WebSocket error:', error);
@@ -160,10 +173,10 @@ export const ChatInterface = () => {
 //     setInput('');
 //   };
 
-  return (
+return (
     <div className="chat-container">
       <div className="message-container">
-        {conversation.map((message, index) => (
+        {conversation.map((message: ChatMessage, index: number) => (
           <div key={index} className={`message ${message.sender}`}>
             {message.text}
           </div>
