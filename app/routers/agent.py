@@ -185,7 +185,7 @@ async def run_call(query: str, stream_it: AsyncCallbackHandler, user: user_depen
     # now query
     await agent.acall(inputs={"input": query})
 
-async def run_websocket_call(query: str, stream_it: AsyncCallbackHandler, user: user_dependency, model: AzureChatOpenAI):
+async def run_websocket_call(query: str, stream_it: AsyncWebsocketCallbackHandler, user: user_dependency, model: AzureChatOpenAI):
     # assign callback handler
     model.callbacks = [stream_it]
     print('inside run_websocket_call and the model callbacks are set')
