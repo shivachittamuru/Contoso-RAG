@@ -270,7 +270,7 @@ async def websocket_chat(websocket: WebSocket, token: str):
         await websocket.accept()
         print('websocket accepted')
         
-        await websocket.send_text(json.dumps({"message": "Welcome to the chat!"}))
+        # await websocket.send_text(json.dumps({"message": "Welcome to the chat!"}))
 
         model = websocket.app.state.azure_openai_chat_client
         
@@ -288,7 +288,7 @@ async def websocket_chat(websocket: WebSocket, token: str):
                 async for message in stream_it.aiter():
                     print('inside stream_it.aiter() about to send a message')
                     print(f"Sending message: {message}")
-                    await websocket.send_text(message)
+                 #   await websocket.send_text(message)
                     print('message sent')
         except WebSocketDisconnect:
             print("WebSocket disconnected")
