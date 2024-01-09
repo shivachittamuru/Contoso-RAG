@@ -115,8 +115,6 @@ export const ChatInterface = () => {
         }
     };
       
-      
-    
     ws.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
@@ -134,48 +132,12 @@ export const ChatInterface = () => {
     event.preventDefault();
     const trimmedInput = input.trim();
     if (trimmedInput) {
-    console.log(`calling initial dispatch with ${trimmedInput}`); 
-    dispatch({type: ADD_MESSAGE, payload: { sender: 'user', text: trimmedInput }});
+        console.log(`calling initial dispatch with ${trimmedInput}`); 
+        dispatch({type: ADD_MESSAGE, payload: { sender: 'user', text: trimmedInput }});
 
-    if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
-        websocketRef.current.send(JSON.stringify({ message: trimmedInput }));
-    }
-      // Initialize a new WebSocket
-    //   if (websocketRef.current) {
-    //     websocketRef.current.close();
-    //   }
-
-    //   websocketRef.current = new WebSocket(`ws://localhost:8000/agent/ws/chat?token=${userToken?.token}`);
-  
-    //   websocketRef.current.onopen = () => {
-    //     console.log('WebSocket Client Connected');
-    //     websocketRef.current?.send(JSON.stringify({ message: trimmedInput }));
-    //   };
-  
-    //   websocketRef.current.onmessage = (event) => {
-    //     console.log('Received message from server: ', event.data);
-    //     // Assume the server sends a special "end_of_message" property to indicate the end of a message
-    //     if (event.data.length > 0) {
-    //         const data = JSON.parse(event.data);
-    //         console.log('Parsed data: ', data);
-    //         console.log('Message text received:', data.message);
-      
-    //         if (data.end_of_message) {
-    //             if (data.message.trim() !== '') {
-    //                 console.log('Dispatching ADD_MESSAGE with data:', data.message);
-    //                 dispatch({ type: 'ADD_MESSAGE', payload: { sender: 'bot', text: data.message } });
-    //             }
-    //         } else {
-    //             console.log('Dispatching APPEND_TO_LAST_MESSAGE with data:', data.message);
-    //             dispatch({ type: 'APPEND_TO_LAST_MESSAGE', payload: { text: data.message } });
-    //         }
-    //     }
-    //   };
-      
-    //   websocketRef.current.onerror = (error) => {
-    //     // Handle any errors that occur
-    //     console.error('WebSocket error:', error);
-    //   };
+        if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+            websocketRef.current.send(JSON.stringify({ message: trimmedInput }));
+        }
     }
   
     // Reset the input field
