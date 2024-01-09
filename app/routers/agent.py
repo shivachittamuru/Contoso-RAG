@@ -155,10 +155,8 @@ class AsyncCallbackHandler(AsyncIteratorCallbackHandler):
         print(token)             
         self.queue.put_nowait(token)   
     
-    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:  
-        print('inside on_llm_end')      
+    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:      
         if response.generations[0][0].generation_info['finish_reason'] == 'stop':    
-            print('inside on_llm_end -  stop')
             self.done.set()       
 
 class AsyncWebsocketCallbackHandler(AsyncIteratorCallbackHandler):   
@@ -171,10 +169,8 @@ class AsyncWebsocketCallbackHandler(AsyncIteratorCallbackHandler):
         await self.websocket.send_text(json.dumps({"message": token, "end_of_message": False}))             
         self.queue.put_nowait(token)   
     
-    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:  
-        print('inside on_llm_end')      
+    async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:     
         if response.generations[0][0].generation_info['finish_reason'] == 'stop':    
-            print('inside on_llm_end -  stop')
             await self.websocket.send_text(json.dumps({"message": "", "end_of_message": True}))
             self.done.set()
 
@@ -188,9 +184,7 @@ async def run_call(query: str, stream_it: AsyncCallbackHandler, user: user_depen
 async def run_websocket_call(query: str, stream_it: AsyncWebsocketCallbackHandler, user: user_dependency, model: AzureChatOpenAI):
     # assign callback handler
     model.callbacks = [stream_it]
-    print('inside run_websocket_call and the model callbacks are set')
     agent = await get_agent_websocket(user, model)
-    print('inside run_websocket_call and the agent is set')
     # now query
     await agent.acall(inputs={"input": query})
 
@@ -260,17 +254,12 @@ async def run_agent_streaming(
 @router.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket, token: str):
     try:
-        print('inside websocket_chat')
-        print(f'token: ${token}')
+        print(f'inside websocket_chat with token ${token}')
         user = await validate_user_token(token)  
         if not user:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-        print('user validated')
         await websocket.accept()
-        print('websocket accepted')
-        
-        # await websocket.send_text(json.dumps({"message": "Welcome to the chat!"}))
 
         model = websocket.app.state.azure_openai_chat_client
         
@@ -280,21 +269,15 @@ async def websocket_chat(websocket: WebSocket, token: str):
         print('task created')
         try:
             while True:
-                print('inside while loop')
                 data = await websocket.receive_text()
-                print(f"While Loop Received data: {data}")
                 await process_streaming_request(data, stream_it, user, model, websocket)
                 print('processed streaming request')
                 async for message in stream_it.aiter():
-                    print('inside stream_it.aiter() about to send a message')
-                    print(f"Sending message: {message}")
-                 #   await websocket.send_text(message)
-                    print('message sent')
+                    print(f'inside stream_it.aiter() about to send a message of {message}')
         except WebSocketDisconnect:
             print("WebSocket disconnected")
         finally:
             task.cancel()
-
     except Exception as e:
         print(f"Error: {e}")
         await websocket.close()
