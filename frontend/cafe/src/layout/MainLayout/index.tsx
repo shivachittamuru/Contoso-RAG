@@ -12,16 +12,19 @@ import { initializeIcons, registerIcons } from '@fluentui/react';
 // This will initialize and register the Fluent UI icons.
 initializeIcons();
 
+// interface MainLayoutProps {
+//     children: React.ReactNode;
+// }
 
 const MainLayout = () => {
     console.log('entered MainLayout.tsx');
   return (
     <>
-    <Header />
-    <div className='d-flex'>
-    <Sidebar></Sidebar>
-    <Container></Container>
-    </div>
+        <Header />
+        <div className='d-flex'>
+            <Sidebar></Sidebar>
+            <Container></Container>
+        </div>
     </>)
 }
 

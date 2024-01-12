@@ -1,24 +1,34 @@
+import { useMsal } from '@azure/msal-react';
 import { IPersonaSharedProps, Persona, PersonaSize, PersonaPresence, PersonaInitialsColor, IPersonaProps } from '@fluentui/react/lib/Persona';
 import { ContextualMenu, IContextualMenuProps } from '@fluentui/react/lib/ContextualMenu';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faDashboard, faArchive } from '@fortawesome/free-solid-svg-icons'
+import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { IRenderFunction } from '@fluentui/react';
-import { useAuth } from '../../security/AuthContext';
+
 
 const Header = () => {
+  const { instance, accounts } = useMsal();
   const [renderDetails, updateRenderDetails] = useState(true);
-  const { isAuthenticated, logout } = useAuth();
+  const isAuthenticated = accounts.length > 0;
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuTarget, setContextMenuTarget] = useState<HTMLElement | null>(null);
+
+  let activeAccount;
+  if (instance) {
+      activeAccount = instance.getActiveAccount();
+  }
+
+  const userName = activeAccount && activeAccount.username ? activeAccount.username : 'Unknown';
+  const userInitials = userName.toUpperCase().substring(0, 2);
 
   const onChange = (ev: unknown, checked: boolean | undefined) => {
     updateRenderDetails(!!checked);
   };
 
   const adminPersona: IPersonaSharedProps = {
-    imageInitials: 'MA',
-    text: 'Installer Admin',
+    imageInitials: userInitials,
+    text: userName
   };
 
   const renderPrimaryTextHandler: IRenderFunction<IPersonaProps> = (props) => {
@@ -31,8 +41,7 @@ const Header = () => {
       text: 'Logout',
       iconProps: { iconName: 'SignOut' },
       onClick: () => {
-        console.log('logging out');
-        logout();
+        instance.logoutRedirect({ postLogoutRedirectUri: '/' });
       },
     },
   ];
@@ -77,7 +86,7 @@ const Header = () => {
             <>
             <Persona
             {...adminPersona}
-            text="Admininstrator"
+            text={userName}
             size={PersonaSize.size24}
             presence={PersonaPresence.none}
             hidePersonaDetails={!renderDetails}

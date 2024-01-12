@@ -6,7 +6,25 @@
 import { LogLevel, RedirectRequest } from "@azure/msal-browser";
 import appSettings from "../config/appSettings"
 
-// TODO: need to get client id and tenant id to set
+export const b2cPolicies = {
+    names: {
+        signUpSignIn: 'B2C_1_signupsignin1',
+        forgotPassword: 'B2C_1_reset_v3',
+        editProfile: 'B2C_1_edit_profile_v2',
+    },
+    authorities: {
+        signUpSignIn: {
+            authority: 'https://bobjacmcaps.b2clogin.com/bobjacmcaps.onmicrosoft.com/B2C_1_signupsignin1',
+        },
+        forgotPassword: {
+            authority: 'https://bobjacmcaps.b2clogin.com/bobjacmcaps.onmicrosoft.com/B2C_1_reset_v3',
+        },
+        editProfile: {
+            authority: 'https://bobjacmcaps.b2clogin.com/bobjacmcaps.onmicrosoft.com/b2c_1_edit_profile_v2',
+        },
+    },
+    authorityDomain: 'bobjacmcaps.b2clogin.com',
+};
 
 /**
  * Configuration object to be passed to MSAL instance on creation. 
@@ -15,9 +33,12 @@ import appSettings from "../config/appSettings"
  */
 export const msalConfig: any = {
     auth: {
-        clientId: "{clientId}",
-        authority: "https://login.microsoftonline.com/{tenantId}",
-        redirectUri: appSettings.auth.redirectUri
+        clientId: 'a94b4d0e-21dc-4145-af64-1d7b172beaf0',
+        authority: b2cPolicies.authorities.signUpSignIn.authority,
+        knownAuthorities: [b2cPolicies.authorityDomain],
+        redirectUri: 'http://localhost:8000/app/', 
+        postLogoutRedirectUri: 'http://localhost:8000/app/', 
+        navigateToLoginRequestUrl: false,
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -48,6 +69,16 @@ export const msalConfig: any = {
     }
 };
 
+export const protectedResources = {
+    coffeeChat: {
+        endpoint: 'ws://localhost:8000/agent/ws/chat',
+        scopes: {
+            read: ['https://bobjacmcaps.onmicrosoft.com/coffee/coffee.read'],
+            write: ['https://bobjacmcaps.onmicrosoft.com/coffee/coffee.write'],
+        },
+    },
+};
+
 /**
  * Scopes you add here will be prompted for user consent during sign-in.
  * By default, MSAL.js will add OIDC scopes (openid, profile, email) to any login request.
@@ -57,7 +88,7 @@ export const msalConfig: any = {
  * ["User.Read", "https://management.core.windows.net//user_impersonation"]
  */
 export const loginRequest: RedirectRequest = {
-    scopes: ["User.Read"]
+    scopes: ["openid", "profile"] 
 };
 
 

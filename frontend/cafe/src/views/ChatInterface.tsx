@@ -1,4 +1,5 @@
 import React, { useReducer, useState, useRef, useEffect } from 'react';
+import { useMsal, useIsAuthenticated } from '@azure/msal-react';
 import './ChatInterface.css';
 import { useAuth } from '../security/AuthContext';
 
@@ -70,7 +71,8 @@ export const ChatInterface = () => {
   const initialState: ConversationState = []; 
   const [conversation, dispatch] = useReducer(conversationReducer, initialState);
   const [input, setInput] = useState('');
-  const { userToken } = useAuth();
+  const { instance, accounts } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
   const endOfMessagesRef = useRef<null | HTMLDivElement>(null);
   const websocketRef = useRef<WebSocket | null>(null);
 
@@ -91,42 +93,54 @@ export const ChatInterface = () => {
   }, []);
 
   useEffect(() => {
-    if (!userToken) return;
-  
-    const ws = new WebSocket(`ws://localhost:8000/agent/ws/chat?token=${userToken.token}`);
+    if (!isAuthenticated) return;
+
+    const request = {
+        // Replace the scopes below with the scopes needed to access your chat API
+        scopes: ["https://bobjacmcaps.onmicrosoft.com/coffee/coffee.read"], 
+        account: accounts[0], // Assuming the user is signed in, the first account will be the signed-in user
+      };
     
-    ws.onopen = () => {
-        console.log('WebSocket Client Connected');
-        dispatch({type: ADD_MESSAGE, payload: { sender: 'user', text: 'Hello' }});
-    };
-    
-    ws.onmessage = (event) => {
-        if (event.data.length > 0) {
-            const data = JSON.parse(event.data);
+    instance.acquireTokenSilent(request).then((response) => {
+        const userToken = response.accessToken;
+        const ws = new WebSocket(`ws://localhost:8000/agent/ws/chat?token=${userToken}`);
+        ws.onopen = () => {
+            console.log('WebSocket Client Connected');
+            dispatch({type: ADD_MESSAGE, payload: { sender: 'user', text: 'Hello' }});
+        };
         
-            if (!data.end_of_message) {
-            dispatch({
-                type: 'APPEND_TO_LAST_MESSAGE',
-                payload: { text: data.message },
-            });
-            } else {
-            dispatch({ type: 'END_OF_MESSAGE' });  // No payload needed for this action
+        ws.onmessage = (event) => {
+            if (event.data.length > 0) {
+                const data = JSON.parse(event.data);
+            
+                if (!data.end_of_message) {
+                dispatch({
+                    type: 'APPEND_TO_LAST_MESSAGE',
+                    payload: { text: data.message },
+                });
+                } else {
+                dispatch({ type: 'END_OF_MESSAGE' });  // No payload needed for this action
+                }
             }
-        }
-    };
+        };
+          
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
       
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+        // Store the WebSocket reference
+        websocketRef.current = ws;
+      
+        // Define the cleanup function
+        return () => {
+          ws.close();
+        };
+    }).catch((error) => {
+        // Handle errors when acquiring the token
+        console.error(error);
+      });
   
-    // Store the WebSocket reference
-    websocketRef.current = ws;
-  
-    // Define the cleanup function
-    return () => {
-      ws.close();
-    };
-  }, [userToken]);
+  }, [instance, isAuthenticated, accounts]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -1,64 +1,32 @@
-import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../security/AuthContext';
-import './LoginPage.css'; 
+import React from 'react';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../security/authConfig'; // Ensure this is the correct path to your loginRequest configuration
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // New state for error message
-  const { login } = useAuth();
-  const navigate = useNavigate();
+    const { instance } = useMsal();
 
-  console.log('entered LoginPage.tsx');
+    // Call this function when the page loads or when you want to redirect the user to the Azure AD B2C login flow
+    const handleLoginRedirect = () => {
+        instance.loginRedirect(loginRequest).catch(e => {
+            // Handle errors when initiating the login flow
+            console.error(e);
+        });
+    };
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      console.log('LoginPage.tsx - handleLogin()');
-      await login(username, password);
-      console.log('LoginPage.tsx - handleLogin() - login successful');
-      navigate('/app');
-    } catch (error) {
-      // Set the error message state if login fails
-      setErrorMessage('Login failed. Please check your username and password.');
-    }
-  };
+    // Trigger the login redirect immediately on component mount
+    React.useEffect(() => {
+        handleLoginRedirect();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  return (
-    <div className="login-container">
-      <div className="login-logo">
-        <img src="/Azure-512p-maskable.png" alt="Logo" className="logo" /> 
-        <h3>Cafe Login</h3>
-      </div>
-      <div className="login-form">
-        <form onSubmit={handleLogin}>
-          {errorMessage && <div className="login-error">{errorMessage}</div>} {/* Display error message */}
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-            />
-          </div>
-          <button type="submit" className="login-button">Login</button>
-        </form>
-      </div>
-    </div>
-  );
+    // Return null or some loading indicator as the user will be redirected
+    return (
+        <div className="login-container">
+            <div className="login-logo">
+                <h3>Redirecting to login...</h3>
+            </div>
+        </div>
+    );
 };
 
 export default LoginPage;
