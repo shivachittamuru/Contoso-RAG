@@ -51,6 +51,14 @@ def get_user(db: Session, username: str):
         raise credentials_exception
     return user
 
+def get_user_by_email(db: Session, email: str):
+    print(f'inside get_user_by_email - {email}')
+    user = db.query(User).filter(User.email == email).first()
+    print(f"user: {user}")
+    if not user:
+        raise credentials_exception
+    return user
+
 def verify_password(plain_password, hashed_password):
     print('inside verify_password')
     return bcrypt_context.verify(plain_password, hashed_password)

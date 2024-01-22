@@ -103,6 +103,7 @@ export const ChatInterface = () => {
     
     instance.acquireTokenSilent(request).then((response) => {
         const userToken = response.accessToken;
+        console.log('userToken: ', userToken);
         const ws = new WebSocket(`ws://localhost:8000/agent/ws/chat?token=${userToken}`);
         ws.onopen = () => {
             console.log('WebSocket Client Connected');

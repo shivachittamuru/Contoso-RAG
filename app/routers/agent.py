@@ -3,6 +3,9 @@
 # from pydantic import BaseModel as BaseModel_FastAPI
 
 import json
+import jwt
+import requests
+from jwt.algorithms import RSAAlgorithm
 from langchain.chat_models import AzureChatOpenAI
 from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import ChatPromptTemplate
@@ -25,7 +28,7 @@ import random
 from prompts import CHAIN_SYSTEM_PROMPT, AGENT_SYSTEM_PROMPT
 from models import User
 from database import get_db
-from .auth import db_dependency, get_current_user, verify_password, get_password_hash, credentials_exception
+from .auth import db_dependency, get_current_user, get_user_by_email, verify_password, get_password_hash, credentials_exception
 from settings import app_settings as settings
 
 from uuid import UUID
@@ -42,6 +45,7 @@ router = APIRouter(
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
+
 
 async def get_agent_websocket(user: dict, model: AzureChatOpenAI) -> AgentExecutor:    
     user_id = user['id']
@@ -213,6 +217,12 @@ async def create_gen(query: str,
 
 ######################
 
+@router.get("/user/{user_id}/chat-history")
+async def get_chat_history(user_id: str, db: Session = Depends(get_db)):
+    chat_history = cosmos.get_chat_history(user_id)
+    return chat_history
+
+
 
 @router.get('/chat', status_code=status.HTTP_200_OK)
 async def run_agent(
@@ -252,24 +262,32 @@ async def run_agent_streaming(
     return StreamingResponse(gen, media_type="text/event-stream")
 
 @router.websocket("/ws/chat")
-async def websocket_chat(websocket: WebSocket, token: str):
+async def websocket_chat(websocket: WebSocket, token: str, db: Session = Depends(get_db)):
     try:
         print(f'inside websocket_chat with token ${token}')
-        user = await validate_user_token(token)  
+        user = await validate_user_token(token, db)  
+        print(f'validated user: {user}')
         if not user:
-            raise HTTPException(status_code=401, detail="Invalid token")
+            print('user not validated')
+            #raise HTTPException(status_code=401, detail="Invalid token")
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return  # Close the connection with an error code
 
         await websocket.accept()
+        print('websocket accepted')
 
         model = websocket.app.state.azure_openai_chat_client
+        print('got model')
         
         stream_it = AsyncWebsocketCallbackHandler(websocket)
+        print('got stream_it')
         task = asyncio.create_task(run_websocket_call(websocket, stream_it, user, model))
-        
         print('task created')
+        
         try:
             while True:
                 data = await websocket.receive_text()
+                print(f'got data: {data}')
                 await process_streaming_request(data, stream_it, user, model, websocket)
                 print('processed streaming request')
                 async for message in stream_it.aiter():
@@ -278,9 +296,15 @@ async def websocket_chat(websocket: WebSocket, token: str):
             print("WebSocket disconnected")
         finally:
             task.cancel()
+    except HTTPException as e:
+        # Close the websocket with an error if the token validation fails
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return  # Stop further processing
     except Exception as e:
         print(f"Error: {e}")
-        await websocket.close()
+        #await websocket.close()
+        # Close the websocket with an error if the token validation fails
+        await websocket.close(code=status.WS_1000_NORMAL_CLOSURE)
 
 async def process_streaming_request(data, stream_it, user, model: AzureChatOpenAI, websocket: WebSocket):
     # Extract the query from the received data
@@ -289,5 +313,64 @@ async def process_streaming_request(data, stream_it, user, model: AzureChatOpenA
     await run_websocket_call(query, stream_it, user, model)
     # You may need to adjust this based on how your agent is set up
 
-async def validate_user_token(token: str):
-    return {'username': 'bobjac', 'id': 3, 'role': 'admin'}
+async def validate_user_token(token: str, db: Session):
+    try:
+        print('Inside validate_user_token')
+        # Decode the token without verification to extract the issuer and email
+        unverified_claims = jwt.decode(token, options={"verify_signature": False})
+        print(f"unverified_claims: {unverified_claims}")
+        issuer = unverified_claims.get("iss")
+        print(f"issuer: {issuer}")
+        email = unverified_claims.get("emails", [])[0] if unverified_claims.get("emails") else None
+        print(f"email: {email}" )
+
+        expected_issuer = settings.azure_b2c_expected_issuer
+        if issuer != expected_issuer:
+            print("The issuer was not expected")
+            raise HTTPException(status_code=401, detail="Invalid token issuer.")
+
+        # Fetch the public keys from Azure AD B2C discovery endpoint
+        jwks_uri = settings.azure_b2c_jwks_uri
+        print(f"jwks_uri: {jwks_uri}")
+        jwks_response = requests.get(jwks_uri)
+        print(f"jwks_response: {jwks_response}")
+        jwks = jwks_response.json()
+        print(f"jwks: {jwks}")
+
+        # Verify the token's signature
+        public_keys = {}
+        for jwk in jwks['keys']:
+            kid = jwk['kid']
+            print(f"kid: {kid}")
+            public_key = RSAAlgorithm.from_jwk(json.dumps(jwk))
+            print(f"public_key: {public_key}")
+            public_keys[kid] = public_key
+
+        print(f"public_keys {public_keys}")
+
+        kid = jwt.get_unverified_header(token)['kid']
+        print(f"kid: {kid}")
+        public_key = public_keys[kid]
+        print(f"public_key: {public_key}")
+
+        audience = "ee05dd02-f5f3-4a7a-903d-727c7239f240"
+        verified_claims = jwt.decode(token, public_key, algorithms=['RS256'], audience=audience)
+        print(f"verified_claims: {verified_claims}")
+
+        print("calling db")
+
+        db_user = get_user_by_email(db, email)
+        if not db_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        print(f"db_user: {db_user}")
+
+        # Check the user's role
+        if db_user.role not in ['user', 'admin']:
+            raise HTTPException(status_code=403, detail="User does not have proper role")
+
+        return {'username': db_user.username, 'id': db_user.id, 'role': db_user.role}
+
+    except jwt.PyJWTError as e:
+        print('failed validating token')
+        raise HTTPException(status_code=401, detail="Token validation failed")

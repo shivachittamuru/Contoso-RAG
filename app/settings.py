@@ -24,6 +24,9 @@ class AppSettings(BaseSettings):
     cosmos_database_name: str = os.environ.get('AZURE_COSMOSDB_NAME')
     cosmos_container_name: str = os.environ.get('AZURE_COSMOSDB_CONTAINER_NAME')
     cosmos_connection_string: str = os.environ.get('AZURE_COMOSDB_CONNECTION_STRING')
+    azure_b2c_expected_issuer: str = os.environ.get('AZURE_B2C_EXPECTED_ISSUER')
+    azure_b2c_jwks_uri: str = os.environ.get('AZURE_B2C_JWKS_URI')
+    azure_b2c_audience: str = os.environ.get('AZURE_B2C_AUDIENCE')
 
     class Config:
         env_file = ".env"
